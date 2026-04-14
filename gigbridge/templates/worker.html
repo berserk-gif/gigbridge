@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Workspace | GigBridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Apply dark mode before first paint to prevent FOUC -->
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');</script>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/theme.js" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            GigBridge
+        </a>
+        <div class="nav-links">
+            <span class="nav-item active">Worker Workspace</span>
+            <span id="nav-username" class="nav-username-chip" style="display:none;">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span id="nav-username-text"></span>
+            </span>
+            <button id="theme-toggle" class="btn-theme"></button>
+            <button id="btn-logout" class="btn btn-secondary btn-sm">Log Out</button>
+        </div>
+    </nav>
+
+    <div class="container dashboard-grid">
+        <aside class="sidebar">
+            <div class="sidebar-title">Perspective</div>
+            <ul class="filter-list">
+                <li class="filter-item active" id="menu-find-work">Find Work</li>
+                <li class="filter-item" id="menu-my-apps">My Applications</li>
+            </ul>
+
+            <div id="category-filter-section" style="margin-top: 2rem;">
+                <div class="sidebar-title">Categories</div>
+                <ul class="filter-list" id="category-list">
+                    <li class="filter-item active" data-cat="All">All Categories</li>
+                    <li class="filter-item" data-cat="Electrical">Electrical</li>
+                    <li class="filter-item" data-cat="Plumbing">Plumbing</li>
+                    <li class="filter-item" data-cat="Carpentry">Carpentry</li>
+                    <li class="filter-item" data-cat="Cleaning">Cleaning</li>
+                    <li class="filter-item" data-cat="IT/Tech">IT / Tech</li>
+                    <li class="filter-item" data-cat="General Handyman">General Handyman</li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- Find Work View -->
+            <div id="view-find-work" class="view-section">
+                <h2>Available Projects</h2>
+                <div id="jobs-container" class="job-list" style="margin-top: 1rem;">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </div>
+
+            <!-- My Applications View -->
+            <div id="view-my-apps" class="view-section" style="display: none;">
+                <h2>My Sent Applications</h2>
+                <div id="my-apps-list" class="job-list">
+                    <div class="empty-state">Loading your applications...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Apply Modal -->
+    <div id="apply-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin: 0;">Submit Proposal</h3>
+                <button class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="apply-job-context" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--surface-alt); border-radius: 8px; border: 1px solid var(--border);">
+                    <div id="apply-job-title" style="font-weight: 600; margin-bottom: 0.25rem;"></div>
+                    <div id="apply-job-budget" style="font-size: 0.875rem; color: var(--text-muted);"></div>
+                </div>
+                <form id="apply-form">
+                    <input type="hidden" id="apply-job-id">
+                    <div class="form-group">
+                        <label class="form-label">Proposed Rate ($)</label>
+                        <input type="text" id="worker-rate" class="form-control" placeholder="e.g. 500 total or 45/hr" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cover Letter / Pitch</label>
+                        <textarea id="worker-message" class="form-control" placeholder="Highlight why you are the best fit for this project..." required></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/worker.js"></script>
+    <script>
+        // Load username into navbar chip
+        fetch('/api/auth/me').then(r => r.json()).then(data => {
+            if (data.loggedIn) {
+                const chip = document.getElementById('nav-username');
+                document.getElementById('nav-username-text').textContent = data.username;
+                chip.style.display = 'inline-flex';
+            }
+        });
+        // Logout
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await fetch('/api/logout');
+            window.location.href = '/auth';
+        });
+    </script>
+</body>
+</html>

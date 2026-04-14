@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Workspace | GigBridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Apply dark mode before first paint to prevent FOUC -->
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');</script>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/theme.js" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            GigBridge
+        </a>
+        <div class="nav-links">
+            <span class="nav-item active">Client Workspace</span>
+            <span id="nav-username" class="nav-username-chip" style="display:none;">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span id="nav-username-text"></span>
+            </span>
+            <button id="theme-toggle" class="btn-theme"></button>
+            <button id="btn-logout" class="btn btn-secondary btn-sm">Log Out</button>
+        </div>
+    </nav>
+
+    <div class="container dashboard-grid">
+        <aside class="sidebar">
+            <div class="sidebar-title">Manage</div>
+            <ul class="filter-list">
+                <li class="filter-item active" id="menu-dashboard">Dashboard</li>
+                <li class="filter-item" id="menu-post-job">Post New Job</li>
+                <li class="filter-item" id="menu-my-jobs">My Postings</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section">
+                <h2>Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Total Jobs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-open">0</div>
+                        <div class="stat-label">Active Jobs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-apps">0</div>
+                        <div class="stat-label">Total Applications</div>
+                    </div>
+                </div>
+                
+                <h3>Recent Postings</h3>
+                <div id="recent-jobs" class="job-list" style="margin-top: 1rem;">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Post Job View -->
+            <div id="view-post-job" class="view-section" style="display: none;">
+                <div class="card">
+                    <h2>Post a New Opportunity</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Fill out the details below to attract top talent.</p>
+                    <form id="post-job-form">
+                        <div class="form-group">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" id="job-title" class="form-control" placeholder="e.g. Senior Electrician needed for wiring project" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select id="job-category" class="form-control" required>
+                                    <option value="" disabled selected>Select category...</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Carpentry">Carpentry</option>
+                                    <option value="Cleaning">Cleaning</option>
+                                    <option value="IT/Tech">IT / Tech</option>
+                                    <option value="General Handyman">General Handyman</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Budget Range</label>
+                                <input type="text" id="job-budget" class="form-control" placeholder="e.g. $500 - $800" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" id="job-location" class="form-control" placeholder="City, State or Remote" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Detailed Description</label>
+                            <textarea id="job-desc" class="form-control" placeholder="Describe the scope of work, requirements, and timeline..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Publish Job Posting</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- My Jobs View -->
+            <div id="view-my-jobs" class="view-section" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Job Postings</h2>
+                    <select id="status-filter" class="form-control" style="width: auto;">
+                        <option value="All">All Statuses</option>
+                        <option value="open">Open</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div id="my-jobs-list" class="job-list">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Applicants Modal -->
+    <div id="applicants-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-job-title" style="margin: 0;">Review Applicants</h3>
+                <button class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="applicants-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/client.js"></script>
+    <script>
+        // Load username into navbar chip
+        fetch('/api/auth/me').then(r => r.json()).then(data => {
+            if (data.loggedIn) {
+                const chip = document.getElementById('nav-username');
+                document.getElementById('nav-username-text').textContent = data.username;
+                chip.style.display = 'inline-flex';
+            }
+        });
+        // Logout
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await fetch('/api/logout');
+            window.location.href = '/auth';
+        });
+    </script>
+</body>
+</html>

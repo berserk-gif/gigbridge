@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigBridge | Professional Gig Marketplace</title>
+    <meta name="description" content="Connect with skilled independent professionals for immediate, short-term, or project-based work.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');</script>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/theme.js" defer></script>
+    <style>
+        /* Landing-specific styles */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent-glow);
+            border: 1px solid rgba(37,99,235,0.25);
+            color: var(--accent);
+            padding: 0.35rem 1rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.5s ease;
+        }
+        .hero h1 { animation: fadeInUp 0.5s 0.1s ease both; }
+        .hero p { animation: fadeInUp 0.5s 0.2s ease both; }
+        .cta-group { animation: fadeInUp 0.5s 0.3s ease both; }
+        .hero-stats { animation: fadeInUp 0.5s 0.4s ease both; }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3.5rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .hero-stat-val {
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.04em;
+        }
+        .hero-stat-label {
+            font-size: 0.775rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 0.15rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+        }
+        .section-sub {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto 3rem;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-top: 2rem;
+        }
+        .step-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 1.75rem;
+            text-align: left;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .step-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent-glow), transparent);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .step-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px -8px rgba(37,99,235,0.15); border-color: var(--accent); }
+        .step-card:hover::after { opacity: 1; }
+        .step-num {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.06em;
+        }
+        .step-card h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+        .step-card p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; }
+
+        .cta-section {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(124,58,237,0.05));
+            border-top: 1px solid var(--border);
+        }
+
+        footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            GigBridge
+        </div>
+        <div class="nav-links">
+            <button id="theme-toggle" class="btn-theme"></button>
+            <a href="/auth" class="btn btn-primary btn-sm">Login / Join →</a>
+        </div>
+    </nav>
+    
+    <main>
+        <!-- Hero -->
+        <section class="hero">
+            <div style="position: relative; z-index: 1;">
+                <div class="hero-badge">
+                    <span style="width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 6px var(--success);"></span>
+                    Now live — Post your first job free
+                </div>
+                <h1>Expert talent for<br>your next project.</h1>
+                <p>Connect with skilled independent professionals for immediate, short-term, or project-based work. Fast, reliable, and simple.</p>
+                <div class="cta-group">
+                    <a href="/auth" class="btn btn-primary btn-lg">
+                        Hire Talent
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                    <a href="/auth" class="btn btn-secondary btn-lg">Find Work</a>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-val">500+</div>
+                        <div class="hero-stat-label">Jobs Posted</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-val">1.2k+</div>
+                        <div class="hero-stat-label">Professionals</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-val">98%</div>
+                        <div class="hero-stat-label">Satisfaction Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="container" style="padding-top: 5rem; padding-bottom: 4rem; text-align: center;">
+            <div class="section-label">Why GigBridge</div>
+            <h2 class="section-title">Built for modern work</h2>
+            <p class="section-sub">A clean, seamless platform that takes the friction out of the gig economy.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3>Secure & Verified</h3>
+                    <p>Every account is role-based. Clients post jobs confidently; workers apply with credibility.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3>Instant Matching</h3>
+                    <p>Filter by category, budget, and location. Find the right fit in minutes, not days.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h3>Talented Professionals</h3>
+                    <p>Electricians, plumbers, IT specialists, and more — all in one place, ready to work.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3>Transparent Budgets</h3>
+                    <p>Every posting comes with a clear budget range. No surprises, no hidden fees.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 5rem 2rem; text-align: center;">
+            <div class="container" style="padding: 0;">
+                <div class="section-label">How It Works</div>
+                <h2 class="section-title">Up and running in minutes</h2>
+                <p class="section-sub">Whether you're hiring or looking for work, GigBridge gets you there fast.</p>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">01</div>
+                        <h3>Create your account</h3>
+                        <p>Sign up as a Client to post jobs, or as a Worker to find gig opportunities in your trade.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">02</div>
+                        <h3>Post or browse jobs</h3>
+                        <p>Clients describe the work and set a budget. Workers filter by category and location.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">03</div>
+                        <h3>Connect & get it done</h3>
+                        <p>Workers submit proposals, clients review applications, and the job gets done.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <h2 class="section-title">Ready to get started?</h2>
+            <p class="section-sub" style="margin-bottom: 2rem;">Join hundreds of clients and professionals already using GigBridge.</p>
+            <div class="cta-group">
+                <a href="/auth" class="btn btn-primary btn-lg">Get Started Free →</a>
+                <a href="/auth" class="btn btn-secondary btn-lg">Browse Jobs</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div style="font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">GigBridge</div>
+        © 2026 GigBridge. All rights reserved.
+    </footer>
+</body>
+</html>

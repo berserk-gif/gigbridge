@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | GigBridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');</script>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/theme.js" defer></script>
+    <style>
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+
+        .auth-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: calc(100vh - 61px);
+        }
+
+        /* Left branding panel */
+        .auth-brand-panel {
+            background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        html.dark-mode .auth-brand-panel {
+            background: linear-gradient(145deg, #080e1a 0%, #160f3b 50%, #080e1a 100%);
+        }
+        .auth-brand-panel::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 65%);
+            top: -100px; right: -100px;
+            border-radius: 50%;
+        }
+        .auth-brand-panel::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 65%);
+            bottom: -80px; left: -80px;
+            border-radius: 50%;
+        }
+        .brand-content { position: relative; z-index: 1; }
+        .brand-logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 3rem;
+            letter-spacing: -0.04em;
+        }
+        .brand-logo svg { color: #60a5fa; }
+
+        .brand-tagline {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1.2;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.25rem;
+        }
+        .brand-tagline span {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .brand-sub {
+            color: rgba(255,255,255,0.55);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 3rem;
+        }
+        .brand-features { list-style: none; display: flex; flex-direction: column; gap: 0.875rem; }
+        .brand-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255,255,255,0.75);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .brand-feature-icon {
+            width: 28px; height: 28px;
+            background: rgba(96,165,250,0.15);
+            border: 1px solid rgba(96,165,250,0.3);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            color: #60a5fa;
+        }
+
+        /* Right form panel */
+        .auth-form-panel {
+            background: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+        }
+        .auth-box {
+            width: 100%;
+            max-width: 420px;
+            animation: fadeInUp 0.4s ease;
+        }
+        .auth-box-header {
+            margin-bottom: 2rem;
+        }
+        .auth-box-header h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.25rem;
+        }
+        .auth-box-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Auth tabs */
+        .auth-tabs {
+            display: flex;
+            background: var(--surface-alt);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 2rem;
+            gap: 4px;
+        }
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.6rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            border-radius: 9px;
+            transition: all 0.2s ease;
+        }
+        .auth-tab.active {
+            background: var(--surface);
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Forms */
+        .auth-form { display: none; animation: fadeInUp 0.3s ease; }
+        .auth-form.active { display: block; }
+
+        /* Role selector cards */
+        .role-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .role-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            background: var(--surface);
+        }
+        .role-card:hover { border-color: var(--accent); }
+        .role-card.selected {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+        .role-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.4rem;
+        }
+        .role-card-title {
+            font-size: 0.825rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .role-card-sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+        #reg-role-hidden { display: none; }
+
+        /* Input with icon */
+        .input-wrapper { position: relative; }
+        .input-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        .input-wrapper .form-control { padding-left: 2.5rem; }
+
+        /* Error */
+        .auth-error {
+            background: rgba(220,38,38,0.08);
+            border: 1px solid rgba(220,38,38,0.2);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin: 1.25rem 0;
+        }
+        .auth-divider::before, .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .auth-layout { grid-template-columns: 1fr; }
+            .auth-brand-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="border-bottom: 1px solid var(--border);">
+        <a href="/" class="brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            GigBridge
+        </a>
+        <div class="nav-links">
+            <button id="theme-toggle" class="btn-theme"></button>
+        </div>
+    </nav>
+
+    <div class="auth-layout">
+        <!-- Left Brand Panel -->
+        <div class="auth-brand-panel">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    GigBridge
+                </div>
+                <div class="brand-tagline">The smarter way to<br><span>find work & hire talent.</span></div>
+                <p class="brand-sub">Join a growing community of clients and tradespeople getting things done — faster, transparently, and without the hassle.</p>
+                <ul class="brand-features">
+                    <li class="brand-feature">
+                        <div class="brand-feature-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        Post jobs in under 60 seconds
+                    </li>
+                    <li class="brand-feature">
+                        <div class="brand-feature-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        Browse proposals from qualified workers
+                    </li>
+                    <li class="brand-feature">
+                        <div class="brand-feature-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        Transparent budgets, no hidden fees
+                    </li>
+                    <li class="brand-feature">
+                        <div class="brand-feature-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        Track all your jobs and applications
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="auth-form-panel">
+            <div class="auth-box">
+                <div class="auth-box-header">
+                    <h2 id="panel-title">Welcome back</h2>
+                    <p id="panel-sub">Sign in to your GigBridge account</p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <div class="auth-tab active" id="tab-login">Sign In</div>
+                    <div class="auth-tab" id="tab-register">Create Account</div>
+                </div>
+
+                <!-- Login Form -->
+                <form id="form-login" class="auth-form active">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </span>
+                            <input type="text" id="login-username" class="form-control" placeholder="Enter your username" required autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                        </div>
+                    </div>
+                    <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%; margin-top: 0.5rem;">
+                        Sign In
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <div id="login-error" class="auth-error"></div>
+                </form>
+
+                <!-- Register Form -->
+                <form id="form-register" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </span>
+                            <input type="text" id="reg-username" class="form-control" placeholder="Choose a username" required autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <input type="password" id="reg-password" class="form-control" placeholder="Create a password" required autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="margin-bottom: 0.75rem;">I want to...</label>
+                        <input type="hidden" id="reg-role-hidden" value="client">
+                        <div class="role-cards">
+                            <div class="role-card selected" data-role="client" id="role-client">
+                                <div class="role-card-icon">🏢</div>
+                                <div class="role-card-title">Hire Talent</div>
+                                <div class="role-card-sub">Post jobs as a Client</div>
+                            </div>
+                            <div class="role-card" data-role="worker" id="role-worker">
+                                <div class="role-card-icon">🔧</div>
+                                <div class="role-card-title">Find Work</div>
+                                <div class="role-card-sub">Apply as a Worker</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" id="reg-btn" class="btn btn-success" style="width:100%;">
+                        Create Account
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <div id="reg-error" class="auth-error"></div>
+                </form>
+
+                <p style="text-align:center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                    By continuing, you agree to GigBridge's terms of service.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+            const panelTitle = document.getElementById('panel-title');
+            const panelSub = document.getElementById('panel-sub');
+
+            function switchTab(isLogin) {
+                tabLogin.classList.toggle('active', isLogin);
+                tabRegister.classList.toggle('active', !isLogin);
+                formLogin.classList.toggle('active', isLogin);
+                formRegister.classList.toggle('active', !isLogin);
+                panelTitle.textContent = isLogin ? 'Welcome back' : 'Create your account';
+                panelSub.textContent = isLogin ? 'Sign in to your GigBridge account' : 'Join thousands of clients and workers';
+            }
+
+            tabLogin.addEventListener('click', () => switchTab(true));
+            tabRegister.addEventListener('click', () => switchTab(false));
+
+            // Role selector cards
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    document.getElementById('reg-role-hidden').value = card.dataset.role;
+                });
+            });
+
+            // Login
+            formLogin.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const err = document.getElementById('login-error');
+                const btn = document.getElementById('login-btn');
+                err.style.display = 'none';
+                btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="animation:spin 0.8s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Signing in...';
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: document.getElementById('login-username').value,
+                            password: document.getElementById('login-password').value
+                        })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        btn.innerHTML = '✓ Redirecting...';
+                        window.location.href = data.role === 'client' ? '/client' : '/worker';
+                    } else {
+                        err.innerHTML = `<strong>Invalid username or password.</strong><br>Don't have an account? <a href="#" id="switch-reg" style="color:var(--accent);font-weight:600;">Register here →</a>`;
+                        err.style.display = 'block';
+                        document.getElementById('switch-reg')?.addEventListener('click', e => { e.preventDefault(); switchTab(false); });
+                    }
+                } finally {
+                    if (btn.disabled) { btn.innerHTML = 'Sign In <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'; btn.disabled = false; }
+                }
+            });
+
+            // Register
+            formRegister.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const err = document.getElementById('reg-error');
+                const btn = document.getElementById('reg-btn');
+                err.style.display = 'none';
+                btn.innerHTML = 'Creating account...'; btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: document.getElementById('reg-username').value,
+                            password: document.getElementById('reg-password').value,
+                            role: document.getElementById('reg-role-hidden').value
+                        })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        btn.innerHTML = '✓ Success! Redirecting...';
+                        window.location.href = data.role === 'client' ? '/client' : '/worker';
+                    } else {
+                        err.textContent = data.error || 'Registration failed. Please try again.';
+                        err.style.display = 'block';
+                    }
+                } finally {
+                    if (btn.disabled) { btn.innerHTML = 'Create Account'; btn.disabled = false; }
+                }
+            });
+        });
+    </script>
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</body>
+</html>
